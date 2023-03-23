@@ -22,4 +22,14 @@ class StudentViewSet(viewsets.ViewSet):
         Student.objects.filter(id=pk).update(father_name=fname)
         return Response({"status":"success","message":"Student father name updated"},
                         status=status.HTTP_200_OK)
-
+ 
+    def partial_update(self, request, pk=None):
+        try:
+            queryset = Student.objects.get(pk=pk)
+            serializer_obj = StudentSerializer(queryset, data=request.data, partial=True)
+            if serializer_obj.is_valid():
+                serializer_obj.save() 
+                return Response(serializer_obj.data, status = status.HTTP_206_PARTIAL_CONTENT)
+            
+        except Exception as error:
+            return Response({"status": "failed", "message":"pk not found!!"}, status=status.HTTP_404_NOT_FOUND)
